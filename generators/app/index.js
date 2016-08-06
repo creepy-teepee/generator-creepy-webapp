@@ -6,87 +6,98 @@ var mkdirp = require('mkdirp');
 var _ = require('underscore.string');
 
 /**
- *    Bower inuit package options (prepended with inuitcss-).
- *    Organise alphabetically within Shearing layer category.
+ * Inuit Bower package options.
+ * Organise alphabetically within Shearing layer category.
  */
 var inuitModules = [
 
   // Settings
-  'defaults',
-  'responsive-settings',
+  'inuit-defaults',
+  'inuit-responsive-settings',
 
   // Tools
-  'functions',
-  'mixins',
-  'responsive-tools',
-  'widths',
+  'inuit-functions',
+  'inuit-mixins',
+  'inuit-responsive-tools',
+  'inuit-tools-widths',
 
   // Generic
-  'box-sizing',
-  'normalize',
-  'reset',
-  'shared',
+  'inuit-box-sizing',
+  'inuit-normalize',
+  'inuit-reset',
+  'inuit-shared',
 
   // Base
-  'headings',
-  'images',
-  'lists',
-  'page',
-  'paragraphs',
+  'inuit-headings',
+  'inuit-images',
+  'inuit-lists',
+  'inuit-page',
+  'inuit-paragraphs',
 
   // Object
-  'box',
-  'buttons',
-  'flag',
-  'layout',
-  'list-bare',
-  'list-block',
-  'list-inline',
-  'list-ui',
-  'media',
-  'pack',
-  'tables',
-  'tabs',
+  'inuit-box',
+  'inuit-buttons',
+  'inuit-flag',
+  'inuit-layout',
+  'inuit-list-bare',
+  'inuit-list-block',
+  'inuit-list-inline',
+  'inuit-list-ui',
+  'inuit-media',
+  'inuit-pack',
+  'inuit-tables',
+  'inuit-tabs',
 
   // Trumps
-  'clearfix',
-  'headings-trumps',
-  'print',
-  'spacing',
-  'spacing-responsive',
-  'widths',
-  'widths-responsive'
+  'inuit-clearfix',
+  'inuit-headings-trumps',
+  'inuit-print',
+  'inuit-spacing',
+  'inuit-spacing-responsive',
+  'inuit-widths',
+  'inuit-widths-responsive'
 ];
 
 /**
- *    Bower plump package options (prepended with plumpcss-).
- *    Organise alphabetically within shearing layer category.
+ * CreepyCSS Bower package options.
+ * Organise alphabetically within shearing layer category.
+ */
+var creepyModules = [
+  // Objects
+  'creepycss-band',
+  'creepycss-exhibit',
+  'creepycss-wrapper'
+];
+
+/**
+ * Plump CSS Bower package options.
+ * Organise alphabetically within shearing layer category.
  */
 var plumpModules = [
 
   // Settings
-  'defaults',
-  'responsive-settings',
+  'plumpcss-defaults',
+  'plumpcss-responsive-settings',
 
   // Tools
-  'functions',
-  'mixins',
+  'plumpcss-functions',
+  'plumpcss-mixins',
 
   // Objects
-  'band',
-  'exhibit',
-  'meter',
-  'stack',
-  'widescreen-frame',
-  'wrapper',
+  'plumpcss-band',
+  'plumpcss-exhibit',
+  'plumpcss-meter',
+  'plumpcss-stack',
+  'plumpcss-widescreen-frame',
+  'plumpcss-wrapper',
 
   // Trumps
-  'floats',
-  'responsive-floats',
-  'hide',
-  'responsive-hide',
-  'text-align',
-  'responsive-text-align'
+  'plumpcss-floats',
+  'plumpcss-responsive-floats',
+  'plumpcss-hide',
+  'plumpcss-responsive-hide',
+  'plumpcss-text-align',
+  'plumpcss-responsive-text-align'
 ];
 
 module.exports = yeoman.generators.Base.extend({
@@ -105,16 +116,22 @@ module.exports = yeoman.generators.Base.extend({
       name : 'inuitModules',
       message : 'Which inuit modules do you require?',
       choices : this._getModuleChoices(inuitModules, true)
-    },{
+    },
+    {
+      type : 'checkbox',
+      name : 'creepyModules',
+      message : 'Which CreepyCSS modules do you require?',
+      choices : this._getModuleChoices(creepyModules, true)
+    },
+    {
       type : 'checkbox',
       name : 'plumpModules',
       message : 'Which plumpcss modules do you require?',
       choices : this._getModuleChoices(plumpModules, true)
     }];
 
-    this.prompt(prompts, function (props) {
-      this.inuitModules = props.inuitModules;
-      this.plumpModules = props.plumpModules;
+    this.prompt(prompts, function(props) {
+      this.config = props;
       done();
     }.bind(this));
   },
@@ -132,11 +149,7 @@ module.exports = yeoman.generators.Base.extend({
 
       // Template NPM and Bower config.
       this.fs.copyTpl(this.templatePath('_package.json'), this.destinationPath('package.json'), { appName : _.slugify(this.appname) });
-      this.fs.copyTpl(this.templatePath('_bower.json'), this.destinationPath('bower.json'), {
-        appName : _.slugify(this.appname),
-        inuitModules : this.inuitModules,
-        plumpModules : this.plumpModules
-      });
+      this.fs.copyTpl(this.templatePath('_bower.json'), this.destinationPath('bower.json'), { appName : _.slugify(this.appname) });
 
       // Create extra directories.
       mkdirp(this.destinationPath('src/images'));
@@ -147,14 +160,19 @@ module.exports = yeoman.generators.Base.extend({
       this.fs.copy(this.templatePath('jshintrc'), this.destinationPath('.jshintrc'));
       this.fs.copy(this.templatePath('jshintignore'), this.destinationPath('.jshintignore'));
       this.fs.copy(this.templatePath('gitignore'), this.destinationPath('.gitignore'));
-      this.fs.copy(this.templatePath('scss-lint'), this.destinationPath('.scss-lint.yml'));
+      this.fs.copy(this.templatePath('sass-lint'), this.destinationPath('.sass-lint.yml'));
       this.fs.copy(this.templatePath('gulpfile.js'), this.destinationPath('gulpfile.js'));
       this.fs.copy(this.templatePath('gulp-config.json'), this.destinationPath('gulp-config.json'));
     }
   },
 
   install: function() {
-    this.installDependencies();
+
+    this.log('Installing Bower packages and running ' + chalk.yellow('npm install'));
+    var bowerModules = this.config.inuitModules.concat(this.config.creepyModules, this.config.plumpModules);
+    this.bowerInstall(bowerModules, { save: true });
+    
+    this.npmInstall();
   },
 
   /**
