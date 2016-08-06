@@ -1,35 +1,35 @@
-//    Gulp utility.
-var gulp    = require('gulp'),
-	gutil   = require('gulp-util');
+// Gulp
+var gulp  = require('gulp');
+var gutil = require('gulp-util');
 
-//    Requires.
-var express     = require('express'),
-	open        = require('open'),
-	rimraf      = require('rimraf'),
-	merge       = require('merge-stream'),
-	runsequence = require('run-sequence'),
-	stylish     = require('jshint-stylish'),
-	ftp         = require('vinyl-ftp');
+// Requires.
+var express     = require('express');
+var open        = require('open');
+var rimraf      = require('rimraf');
+var merge       = require('merge-stream');
+var runsequence = require('run-sequence');
+var stylish     = require('jshint-stylish');
+var ftp         = require('vinyl-ftp');
 
-//    Plugin requires.
-var concat       = require('gulp-concat'),
-	uglify       = require('gulp-uglify'),
-	jshint       = require('gulp-jshint'),
-	rename       = require('gulp-rename'),
-	swig         = require('gulp-swig'),
-	sass         = require('gulp-sass'),
-	autoprefixer = require('gulp-autoprefixer'),
-	minifycss    = require('gulp-minify-css'),
-	imagemin     = require('gulp-imagemin'),
-	newer        = require('gulp-newer'),
-	insert       = require('gulp-insert'),
-	livereload   = require('gulp-livereload'),
-	scsslint     = require('gulp-scss-lint');
+// Gulp Plugin requires.
+var concat       = require('gulp-concat');
+var uglify       = require('gulp-uglify');
+var jshint       = require('gulp-jshint');
+var rename       = require('gulp-rename');
+var swig         = require('gulp-swig');
+var sass         = require('gulp-sass');
+var cssnano      = require('gulp-cssnano');
+var autoprefixer = require('gulp-autoprefixer');
+var imagemin     = require('gulp-imagemin');
+var newer        = require('gulp-newer');
+var insert       = require('gulp-insert');
+var livereload   = require('gulp-livereload');
+var sasslint     = require('gulp-sass-lint');
 
-//    Load external config.
+// Load external config.
 var config = require('./gulp-config.json');
 
-//    Load command-line arguments.
+// Load command-line arguments.
 var argv = require('yargs').argv;
 
 /**
@@ -87,33 +87,27 @@ gulp.task('scripts', function() {
 });
 
 /**
- *    Styles build task. Compiles CSS from SASS, auto-prefixes
- *    and outputs both a minified and non-minified version into
- *    dist/ and dev/ respectively.
+ * Styles task.
  *
- * 1. Using all files defined in files.styles config.
- * 2. Compile using SASS, expanded style.
- * 3. Auto-prefix (e.g. -moz-) using last 2 browser versions.
- * 4. Output prefixed but non-minifed CSS to dev/css
- * 5. Rename to .min.css
- * 6. Minify the CSS.
- * 7. Output prefixed, minified CSS to dist/css.
+ * 1. Using all .scss files in styles src directory.
+ * 2. Lint using the defined config.
+ * 3. Auto-prefix CSS rules (e.g. transform => -webkit-transform)
+ * 4. Output unminified version.
+ * 5. Minify using cssnano.
+ * 6. Rename the minified version to avoid overwriting.
+ * 7. Output minified version.
  */
 gulp.task('styles', function() {
 
-	return gulp.src(config.files.styles) /* [1] */
-		.pipe(scsslint({
-		    'config': '.scss-lint.yml'
-		}))
-		.pipe(sass({  /* [2] */
-			style : 'expanded',
-			onError: injectError
-		}))
-		.pipe(autoprefixer('last 2 versions')) /* [3] */
-		.pipe(gulp.dest('dev/css')) /* [4] */
-		.pipe(rename({ suffix : '.min' })) /* [5] */
-		.pipe(minifycss()) /* [6] */
-		.pipe(gulp.dest('dist/css')); /* [7] */
+	return gulp.src(config.files.styles)			  // [1]
+		.pipe(sasslint({'config': '.sass-lint.yml'})) // [2]
+		.pipe(sasslint.format())
+		.pipe(sass().on('error', injectError))
+		.pipe(autoprefixer('last 2 versions'))        // [3]
+		.pipe(gulp.dest('dev/css'))                   // [4]
+		.pipe(cssnano())                              // [5]
+		.pipe(rename({ suffix : '.min' }))            // [6]
+		.pipe(gulp.dest('dist/css'));                 // [7]
 
 });
 
