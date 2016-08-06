@@ -1,6 +1,6 @@
 {
   "name": "generator-creepy-webapp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Yeoman generator for front-end projects.",
   "homepage": "https://github.com/creepy-teepee/generator-creepy-webapp",
   "author": {
