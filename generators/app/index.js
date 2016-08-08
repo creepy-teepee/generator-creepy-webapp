@@ -66,7 +66,11 @@ var creepyModules = [
   // Objects
   'creepycss-band',
   'creepycss-exhibit',
-  'creepycss-wrapper'
+  'creepycss-wrapper',
+  
+  // Trumps
+  'creepycss-text-align',
+  'creepycss-text-align-responsive'
 ];
 
 /**
